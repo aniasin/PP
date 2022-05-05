@@ -15,11 +15,19 @@ class PP_API AMovingPlatform : public AStaticMeshActor
 	GENERATED_BODY()
 
 public:
-	AMovingPlatform();
-
-	virtual void Tick(float DeltaSeconds) override;
+	AMovingPlatform(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	void MovePlatform(float DeltaSeconds);
+
+
+	FVector BeginLocation;
+	FVector EndLocation;
+
+	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
+	FVector TargetLocation;
 
 	UPROPERTY(EditAnywhere)
 	float MovingSpeed;
