@@ -2,6 +2,7 @@
 .vs/
 
 Content/Characters/*
+CommandPrompt.txt
 
 # Compiled Object files
 *.slo
