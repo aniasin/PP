@@ -44,17 +44,18 @@ void AMovingPlatform::BeginPlay()
 
 void AMovingPlatform::OnBeginOverlap(class UPrimitiveComponent* OverlapedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("BEGIN OVERLAP!"));
-	if (!bTriggered) return;
+	if (!bTriggered || !HasAuthority()) return;
+
 	bActive = true;
+	UE_LOG(LogTemp, Warning, TEXT("BEGIN OVERLAP!"));
 }
 
 void AMovingPlatform::OnEndOverlap(class UPrimitiveComponent* OverlapedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("END OVERLAP!"));
-	if (!bTriggered) return;
+	if (!bTriggered || !HasAuthority()) return;
+
 	bActive = false;
-	
+	UE_LOG(LogTemp, Warning, TEXT("END OVERLAP!"));
 }
 
 void AMovingPlatform::MovePlatform(float DeltaSeconds)

@@ -17,7 +17,7 @@ public:
 
 	AMovingPlatform(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* TriggerBox;
 
 	FVector BeginLocation;
@@ -30,7 +30,7 @@ public:
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
 	FVector TargetLocation;
 	UPROPERTY(EditAnywhere)
-	float MovingSpeed;
+	float MovingSpeed = 50;
 
 protected:
 
