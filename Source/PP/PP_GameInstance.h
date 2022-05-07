@@ -14,7 +14,15 @@ class PP_API UPP_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-	virtual void Init() override;
+public:
+	UPP_GameInstance(const FObjectInitializer& ObjectInitializer);
+
+	TSubclassOf<UUserWidget> MenuClass;
+
+	virtual void Init();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadMenu();
 
 	UFUNCTION(Exec)
 	void Host();
