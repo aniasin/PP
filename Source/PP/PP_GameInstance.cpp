@@ -8,7 +8,7 @@
 
 UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/MenuSystem/BP_MainMenu"));
 	if (MainMenuBPClass.Class != NULL)
 	{
 		MenuClass = MainMenuBPClass.Class;
@@ -31,7 +31,6 @@ void UPP_GameInstance::LoadMenu()
 	if (!PC) return;
 
 	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(Menu->TakeWidget());
 	PC->SetInputMode(InputMode);
 	PC->bShowMouseCursor = true;
 }
