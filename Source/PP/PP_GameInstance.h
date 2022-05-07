@@ -7,7 +7,6 @@
 #include "PP/MenuSystem/MenuInterface.h"
 #include "PP_GameInstance.generated.h"
 
-class UMainMenu;
 
 UCLASS()
 class PP_API UPP_GameInstance : public UGameInstance, public IMenuInterface
@@ -16,8 +15,6 @@ class PP_API UPP_GameInstance : public UGameInstance, public IMenuInterface
 
 public:
 	UPP_GameInstance(const FObjectInitializer& ObjectInitializer);
-
-	TSubclassOf<UMainMenu> MenuClass;
 
 	virtual void Init();
 
@@ -29,5 +26,9 @@ public:
 
 	UFUNCTION(Exec)
 	void Join(const FString& IPAddress);
+
+private:
+	TSubclassOf<class UUserWidget> MenuClass;
+	class UMainMenu* Menu;
 	
 };

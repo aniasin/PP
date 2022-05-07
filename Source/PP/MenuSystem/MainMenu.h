@@ -16,8 +16,6 @@ class PP_API UMainMenu : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	IMenuInterface* MenuInterface;
-
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_Host;
 	UPROPERTY(meta = (BindWidget))
@@ -25,10 +23,14 @@ public:
 
 	void SetMenuInterface(IMenuInterface* MenuInterfaceRef);
 
+	void SetUp();
+	void TearDown();
+
 protected:
 	virtual bool Initialize();
 
 private:
+	IMenuInterface* MenuInterface;
 
 	UFUNCTION()
 	void HostServer();

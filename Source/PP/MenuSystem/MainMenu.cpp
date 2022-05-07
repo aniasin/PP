@@ -24,6 +24,36 @@ void UMainMenu::SetMenuInterface(IMenuInterface* MenuInterfaceRef)
 	MenuInterface = MenuInterfaceRef;
 }
 
+void UMainMenu::SetUp()
+{
+	this->AddToViewport();
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	APlayerController* PC = World->GetFirstPlayerController();
+	if (!PC) return;
+
+	FInputModeUIOnly InputMode;
+	PC->SetInputMode(InputMode);
+	PC->SetShowMouseCursor(true);	
+}
+
+void UMainMenu::TearDown()
+{
+	this->RemoveFromViewport();
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	APlayerController* PC = World->GetFirstPlayerController();
+	if (!PC) return;
+
+	FInputModeGameOnly InputMode;
+	PC->SetInputMode(InputMode);
+	PC->SetShowMouseCursor(false);
+}
+
 void UMainMenu::HostServer()
 {
 	if (!MenuInterface) return;
