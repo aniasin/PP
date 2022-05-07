@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "PP/MenuSystem/MenuInterface.h"
+#include "PP/MenuSystem/MenuBase.h"
 #include "MainMenu.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PP_API UMainMenu : public UUserWidget
+class PP_API UMainMenu : public UMenuBase
 {
 	GENERATED_BODY()
 	
@@ -20,17 +19,31 @@ public:
 	class UButton* BTN_Host;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_Join;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BTN_CancelJoinGame;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* BTN_JoinGame;
 
-	void SetMenuInterface(IMenuInterface* MenuInterfaceRef);
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* Switcher;
 
-	void SetUp();
-	void TearDown();
+	UPROPERTY(meta = (BindWidget))
+	class UWidget* MainMenu;
+	UPROPERTY(meta = (BindWidget))
+	class UWidget* JoinMenu;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* IPAddressField;
 
 protected:
 	virtual bool Initialize();
 
 private:
-	IMenuInterface* MenuInterface;
+	UFUNCTION()
+	void OpenJoinMenu();
+
+	UFUNCTION()
+	void OpenMainMenu();
 
 	UFUNCTION()
 	void HostServer();

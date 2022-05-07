@@ -4,7 +4,7 @@
 #include "PP_GameInstance.h"
 #include "Engine/Engine.h"
 #include "Blueprint/UserWidget.h"
-#include "PP/MenuSystem/MainMenu.h"
+#include "PP/MenuSystem/MenuBase.h"
 
 
 UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
@@ -13,13 +13,20 @@ UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 	if (MainMenuBPClass.Class != NULL)
 	{
 		MenuClass = MainMenuBPClass.Class;
-		UE_LOG(LogTemp, Warning, TEXT("Game Instance has been Constructed! Found Main Menu Widget: %s"), *MenuClass->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Found Main Menu Widget: %s"), *MenuClass->GetName());
+	}
+	static ConstructorHelpers::FClassFinder<UUserWidget> GameMenuBPClass(TEXT("/Game/MenuSystem/BP_GameMenu"));
+	if (GameMenuBPClass.Class != NULL)
+	{
+		GameMenuClass = GameMenuBPClass.Class;
+		UE_LOG(LogTemp, Warning, TEXT("Found Game Menu Widget: %s"), *GameMenuClass->GetName());
 	}
 }
 
 void UPP_GameInstance::Init()
 {
 	if (!MenuClass) UE_LOG(LogTemp, Warning, TEXT("MenuClass has not been set in GameInstance!"))
+	if (!GameMenuClass) UE_LOG(LogTemp, Warning, TEXT("GameMenuClass has not been set in GameInstance!"))
 	UE_LOG(LogTemp, Warning, TEXT("Game Instance has been Initialized!"))
 }
 
@@ -27,10 +34,20 @@ void UPP_GameInstance::LoadMenu()
 {
 	if (!MenuClass) return;
 
-	Menu = CreateWidget<UMainMenu>(this, MenuClass);
+	Menu = CreateWidget<UMenuBase>(this, MenuClass);
 	if (!Menu) return;
 	Menu->SetMenuInterface(this);
 	Menu->SetUp();
+}
+
+void UPP_GameInstance::LoadGameMenu()
+{
+	if (!GameMenuClass) return;
+
+	UMenuBase* GameMenu = CreateWidget<UMenuBase>(this, GameMenuClass);
+	if (!GameMenu) return;
+	GameMenu->SetMenuInterface(this);
+	GameMenu->SetUp();
 }
 
 void UPP_GameInstance::Host()

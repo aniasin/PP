@@ -3,6 +3,8 @@
 
 #include "PP/MenuSystem/MainMenu.h"
 #include "Components/Button.h"
+#include "Components/EditableTextBox.h"
+#include "Components/WidgetSwitcher.h"
 
 
 bool UMainMenu::Initialize()
@@ -14,44 +16,27 @@ bool UMainMenu::Initialize()
 	BTN_Host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
 
 	if (!BTN_Join) return false;
-	BTN_Join->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
+	BTN_Join->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
+
+	if (!BTN_JoinGame) return false;
+	BTN_JoinGame->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
+
+	if (!BTN_CancelJoinGame) return false;
+	BTN_CancelJoinGame->OnClicked.AddDynamic(this, &UMainMenu::OpenMainMenu);
 
 	return true;
 }
 
-void UMainMenu::SetMenuInterface(IMenuInterface* MenuInterfaceRef)
+void UMainMenu::OpenJoinMenu()
 {
-	MenuInterface = MenuInterfaceRef;
+	if (!Switcher || !JoinMenu) return;
+	Switcher->SetActiveWidget(JoinMenu);
 }
 
-void UMainMenu::SetUp()
+void UMainMenu::OpenMainMenu()
 {
-	this->AddToViewport();
-
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	APlayerController* PC = World->GetFirstPlayerController();
-	if (!PC) return;
-
-	FInputModeUIOnly InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(true);	
-}
-
-void UMainMenu::TearDown()
-{
-	this->RemoveFromViewport();
-
-	UWorld* World = GetWorld();
-	if (!World) return;
-
-	APlayerController* PC = World->GetFirstPlayerController();
-	if (!PC) return;
-
-	FInputModeGameOnly InputMode;
-	PC->SetInputMode(InputMode);
-	PC->SetShowMouseCursor(false);
+	if (!Switcher || !MainMenu) return;
+	Switcher->SetActiveWidget(MainMenu);
 }
 
 void UMainMenu::HostServer()
@@ -62,7 +47,8 @@ void UMainMenu::HostServer()
 
 void UMainMenu::JoinServer()
 {
-	if (!MenuInterface) return;
-	MenuInterface->Join("192.168.0.3");
+	if (!MenuInterface || !IPAddressField) return;
+	const FString& Address = IPAddressField->GetText().ToString();
+	MenuInterface->Join(Address);
 
 }
