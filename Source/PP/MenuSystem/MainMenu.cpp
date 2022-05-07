@@ -4,6 +4,7 @@
 #include "PP/MenuSystem/MainMenu.h"
 #include "Components/Button.h"
 
+
 bool UMainMenu::Initialize()
 {
 	bool bsuccess = Super::Initialize();
@@ -18,12 +19,20 @@ bool UMainMenu::Initialize()
 	return true;
 }
 
+void UMainMenu::SetMenuInterface(IMenuInterface* MenuInterfaceRef)
+{
+	MenuInterface = MenuInterfaceRef;
+}
+
 void UMainMenu::HostServer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Hosting Server! ..."));
+	if (!MenuInterface) return;
+	MenuInterface->Host();
 }
 
 void UMainMenu::JoinServer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Joining Server! ..."));
+	if (!MenuInterface) return;
+	MenuInterface->Join("192.168.0.3");
+
 }

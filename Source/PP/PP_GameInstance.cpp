@@ -3,12 +3,12 @@
 
 #include "PP_GameInstance.h"
 #include "Engine/Engine.h"
-#include "Blueprint/UserWidget.h"
+#include "PP/MenuSystem/MainMenu.h"
 
 
 UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/MenuSystem/BP_MainMenu"));
+	static ConstructorHelpers::FClassFinder<UMainMenu> MainMenuBPClass(TEXT("/Game/MenuSystem/BP_MainMenu"));
 	if (MainMenuBPClass.Class != NULL)
 	{
 		MenuClass = MainMenuBPClass.Class;
@@ -23,8 +23,9 @@ void UPP_GameInstance::Init()
 
 void UPP_GameInstance::LoadMenu()
 {
-	UUserWidget* Menu = CreateWidget<UUserWidget>(this, MenuClass);
+	UMainMenu* Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!Menu) return;
+	Menu->SetMenuInterface(this);
 	Menu->AddToViewport();
 
 	APlayerController* PC = GetFirstLocalPlayerController();

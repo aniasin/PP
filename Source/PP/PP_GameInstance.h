@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "PP/MenuSystem/MenuInterface.h"
 #include "PP_GameInstance.generated.h"
 
-/**
- * 
- */
+class UMainMenu;
+
 UCLASS()
-class PP_API UPP_GameInstance : public UGameInstance
+class PP_API UPP_GameInstance : public UGameInstance, public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
 	UPP_GameInstance(const FObjectInitializer& ObjectInitializer);
 
-	TSubclassOf<UUserWidget> MenuClass;
+	TSubclassOf<UMainMenu> MenuClass;
 
 	virtual void Init();
 
