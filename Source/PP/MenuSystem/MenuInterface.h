@@ -24,5 +24,7 @@ class PP_API IMenuInterface
 public:
 	virtual void Host() = 0;
 	virtual void Join(const FString& IPAddress) = 0;
+	virtual void LoadMainMenu() = 0;
+	virtual void QuitGame() = 0;
 
 };

@@ -18,6 +18,9 @@ bool UMainMenu::Initialize()
 	if (!BTN_Join) return false;
 	BTN_Join->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
 
+	if (!BTN_Quit) return false;
+	BTN_Quit->OnClicked.AddDynamic(this, &UMainMenu::QuitGame);
+
 	if (!BTN_JoinGame) return false;
 	BTN_JoinGame->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 
@@ -37,6 +40,12 @@ void UMainMenu::OpenMainMenu()
 {
 	if (!Switcher || !MainMenu) return;
 	Switcher->SetActiveWidget(MainMenu);
+}
+
+void UMainMenu::QuitGame()
+{
+	if (!MenuInterface) return;
+	MenuInterface->QuitGame();
 }
 
 void UMainMenu::HostServer()

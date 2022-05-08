@@ -65,3 +65,15 @@ void UPP_GameInstance::Join(const FString& IPAddress)
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("JOINING " + IPAddress + "..."));
 	GetFirstLocalPlayerController()->ClientTravel(IPAddress, ETravelType::TRAVEL_Absolute);
 }
+
+void UPP_GameInstance::LoadMainMenu()
+{
+	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Main Menu... " ));
+	GetFirstLocalPlayerController()->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
+}
+
+void UPP_GameInstance::QuitGame()
+{
+	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Quiting... "));
+	GetFirstLocalPlayerController()->ConsoleCommand("quit");
+}

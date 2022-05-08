@@ -20,6 +20,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_Join;
 	UPROPERTY(meta = (BindWidget))
+	class UButton* BTN_Quit;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_CancelJoinGame;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_JoinGame;
@@ -41,13 +43,12 @@ protected:
 private:
 	UFUNCTION()
 	void OpenJoinMenu();
-
 	UFUNCTION()
 	void OpenMainMenu();
-
+	UFUNCTION()
+	void QuitGame();
 	UFUNCTION()
 	void HostServer();
-
 	UFUNCTION()
 	void JoinServer();
 };
