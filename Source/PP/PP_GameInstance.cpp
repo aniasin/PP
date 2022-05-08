@@ -28,6 +28,7 @@ void UPP_GameInstance::Init()
 	if (!MenuClass) UE_LOG(LogTemp, Warning, TEXT("MenuClass has not been set in GameInstance!"))
 	if (!GameMenuClass) UE_LOG(LogTemp, Warning, TEXT("GameMenuClass has not been set in GameInstance!"))
 	UE_LOG(LogTemp, Warning, TEXT("Game Instance has been Initialized!"))
+	GEngine->OnNetworkFailure().AddUObject(this, &UPP_GameInstance::NetworkError);
 }
 
 void UPP_GameInstance::LoadMenu()
@@ -63,12 +64,14 @@ void UPP_GameInstance::Join(const FString& IPAddress)
 	if (Menu) Menu->TearDown();
 
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("JOINING " + IPAddress + "..."));
+	GetFirstLocalPlayerController()->PreClientTravel(IPAddress, ETravelType::TRAVEL_Absolute, false);
 	GetFirstLocalPlayerController()->ClientTravel(IPAddress, ETravelType::TRAVEL_Absolute);
 }
 
 void UPP_GameInstance::LoadMainMenu()
-{
+{	
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Main Menu... " ));
+
 	GetFirstLocalPlayerController()->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
 }
 
@@ -76,4 +79,9 @@ void UPP_GameInstance::QuitGame()
 {
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Quiting... "));
 	GetFirstLocalPlayerController()->ConsoleCommand("quit");
+}
+
+void UPP_GameInstance::NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	LoadMainMenu();
 }

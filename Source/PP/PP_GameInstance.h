@@ -32,6 +32,8 @@ public:
 	UFUNCTION()
 	void QuitGame() override;
 
+	void NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
+
 private:
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
