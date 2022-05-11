@@ -3,6 +3,7 @@
 
 #include "PP_GameInstance.h"
 #include "Engine/Engine.h"
+#include "OnlineSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "PP/MenuSystem/MenuBase.h"
 
@@ -25,9 +26,20 @@ UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 
 void UPP_GameInstance::Init()
 {
-	if (!MenuClass) UE_LOG(LogTemp, Warning, TEXT("MenuClass has not been set in GameInstance!"))
-	if (!GameMenuClass) UE_LOG(LogTemp, Warning, TEXT("GameMenuClass has not been set in GameInstance!"))
-	UE_LOG(LogTemp, Warning, TEXT("Game Instance has been Initialized!"))
+	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+	FString message;
+	OnlineSubsystem != nullptr ? message = OnlineSubsystem->GetSubsystemName().ToString() : "OnlineSubsystem not found!";
+	UE_LOG(LogTemp, Warning, TEXT("Loaded subsystem: %s"), *message)
+
+	if (OnlineSubsystem->GetSessionInterface().IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Found OnlineSession"))
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnlineSession not found!"))
+	}
+	
 	GEngine->OnNetworkFailure().AddUObject(this, &UPP_GameInstance::NetworkError);
 }
 
