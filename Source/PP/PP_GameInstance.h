@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
 #include "PP/MenuSystem/MenuInterface.h"
 #include "PP_GameInstance.generated.h"
@@ -25,6 +26,9 @@ public:
 
 	UFUNCTION()
 	void Host() override;
+
+	void CreateSession();
+
 	UFUNCTION()
 	void Join(const FString& IPAddress) override;
 	UFUNCTION()
@@ -32,11 +36,20 @@ public:
 	UFUNCTION()
 	void QuitGame() override;
 
+	void DestroySession();
+
 	void NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
 private:
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
 	class UMenuBase* Menu;
+
+	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
+
+	void SessionCreated(FName SessionName, bool bSuccess);
+	void SessionDestroyed(FName SessionName, bool bSuccess);
+	void FoundSession(bool bSuccess);
 	
 };
