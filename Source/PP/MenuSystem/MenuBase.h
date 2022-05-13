@@ -21,6 +21,8 @@ public:
 	void SetUp();
 	void TearDown();
 
+	virtual void FoundSessions(TArray<FString> Sessions);
+
 protected:
 	IMenuInterface* MenuInterface;
 	

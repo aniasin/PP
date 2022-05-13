@@ -16,13 +16,13 @@ UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 	if (MainMenuBPClass.Class != NULL)
 	{
 		MenuClass = MainMenuBPClass.Class;
-		UE_LOG(LogTemp, Warning, TEXT("Found Main Menu Widget: %s"), *MenuClass->GetName());
+		if (!MenuClass)	UE_LOG(LogTemp, Warning, TEXT("Could not find MenuClass in GameInstance!"));
 	}
 	static ConstructorHelpers::FClassFinder<UUserWidget> GameMenuBPClass(TEXT("/Game/MenuSystem/BP_GameMenu"));
 	if (GameMenuBPClass.Class != NULL)
 	{
 		GameMenuClass = GameMenuBPClass.Class;
-		UE_LOG(LogTemp, Warning, TEXT("Found Game Menu Widget: %s"), *GameMenuClass->GetName());
+		if (!GameMenuClass)	UE_LOG(LogTemp, Warning, TEXT("Could not find GameMenuClass in GameInstance!"));
 	}
 }
 
@@ -39,6 +39,7 @@ void UPP_GameInstance::Init()
 		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::SessionCreated);
 		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::SessionDestroyed);
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::FoundSession);
+		SessionInterface->OnCancelFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::CancelSearchSession);
 	}
 	else { UE_LOG(LogTemp, Warning, TEXT("Session Interface not found!")) }
 
@@ -97,6 +98,15 @@ void UPP_GameInstance::Host()
 
 void UPP_GameInstance::Join(const FString& IPAddress)
 {
+	if (!SessionInterface || !SessionInterface->GetNamedSession(SESSION_NAME))
+	{
+		if (Menu) Menu->TearDown();
+		GetWorld()->ServerTravel("Map01?listen");
+	}
+}
+
+void UPP_GameInstance::SearchSession()
+{
 	if (SessionInterface && SessionInterface->GetNamedSession(SESSION_NAME))
 	{
 		SessionSearch = MakeShareable(new FOnlineSessionSearch);
@@ -106,10 +116,13 @@ void UPP_GameInstance::Join(const FString& IPAddress)
 			UE_LOG(LogTemp, Warning, TEXT("Searching Session..."))
 		}
 	}
-	else
+}
+
+void UPP_GameInstance::CancelSearchSession()
+{
+	if (SessionInterface && SessionSearch)
 	{
-		if (Menu) Menu->TearDown();
-		GetWorld()->ServerTravel("Map01?listen");
+		SessionInterface->CancelFindSessions();
 	}
 }
 
@@ -158,16 +171,27 @@ void UPP_GameInstance::SessionDestroyed(FName SessionName, bool bSuccess)
 
 void UPP_GameInstance::FoundSession(bool bSuccess)
 {
+	TArray<FString> Results;
 	if (bSuccess && SessionSearch)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found Session!"))
 		for (const FOnlineSessionSearchResult& SessionSearchResult : SessionSearch->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found Sessions names: %s!"), *SessionSearchResult.GetSessionIdStr())
+			Results.Add(SessionSearchResult.Session.OwningUserName);
+			
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No session found!"))
+		Results.Add("No Session Found!");
 	}
+	Menu->FoundSessions(Results);
 }
+
+void UPP_GameInstance::CancelSearchSession(bool bSuccess)
+{
+	if(bSuccess) UE_LOG(LogTemp, Warning, TEXT("Search Canceled!"))
+}
+
+
+

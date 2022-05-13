@@ -13,7 +13,10 @@ UCLASS()
 class PP_API UMainMenu : public UMenuBase
 {
 	GENERATED_BODY()
-	
+
+	UMainMenu(const FObjectInitializer& ObjectInitializer);
+	TSubclassOf<class UUserWidget> ServerResultClass;
+
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_Host;
@@ -35,7 +38,12 @@ public:
 	class UWidget* JoinMenu;
 
 	UPROPERTY(meta = (BindWidget))
-	class UEditableTextBox* IPAddressField;
+	class UPanelWidget* ScrollBox_ServerList;
+
+	UPROPERTY()
+	TArray<UUserWidget*> ServerResults;
+
+	virtual void FoundSessions(TArray<FString> Sessions) override;
 
 protected:
 	virtual bool Initialize();

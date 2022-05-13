@@ -32,6 +32,10 @@ public:
 	UFUNCTION()
 	void Join(const FString& IPAddress) override;
 	UFUNCTION()
+	void SearchSession() override;
+	UFUNCTION()
+	void CancelSearchSession() override;
+	UFUNCTION()
 	void LoadMainMenu() override;
 	UFUNCTION()
 	void QuitGame() override;
@@ -43,6 +47,7 @@ public:
 private:
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
+
 	class UMenuBase* Menu;
 
 	IOnlineSessionPtr SessionInterface;
@@ -51,5 +56,6 @@ private:
 	void SessionCreated(FName SessionName, bool bSuccess);
 	void SessionDestroyed(FName SessionName, bool bSuccess);
 	void FoundSession(bool bSuccess);
+	void CancelSearchSession(bool bSuccess);
 	
 };

@@ -5,7 +5,17 @@
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/WidgetSwitcher.h"
+#include "PP/MenuSystem/ServerResult.h"
 
+UMainMenu::UMainMenu(const FObjectInitializer& ObjectInitializer)
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> ServerResultBPClass(TEXT("/Game/MenuSystem/BP_ServerResult"));
+	if (ServerResultBPClass.Class != NULL)
+	{
+		ServerResultClass = ServerResultBPClass.Class;
+		if (!ServerResultClass)	UE_LOG(LogTemp, Warning, TEXT("Could not find ServerResultWidget in MainMenu!"));
+	}
+}
 
 bool UMainMenu::Initialize()
 {
@@ -34,11 +44,24 @@ void UMainMenu::OpenJoinMenu()
 {
 	if (!Switcher || !JoinMenu) return;
 	Switcher->SetActiveWidget(JoinMenu);
+	MenuInterface->SearchSession();
+}
+
+void UMainMenu::FoundSessions(TArray<FString> Sessions)
+{
+	for (const FString Session : Sessions)
+	{
+		UServerResult* ServerResult = CreateWidget<UServerResult>(this, ServerResultClass);
+		ScrollBox_ServerList->AddChild(ServerResult);
+		ServerResult->SetTitleText(Session);
+	}
 }
 
 void UMainMenu::OpenMainMenu()
 {
-	if (!Switcher || !MainMenu) return;
+	if (!Switcher || !MainMenu || !ScrollBox_ServerList) return;
+	ScrollBox_ServerList->ClearChildren();
+	MenuInterface->CancelSearchSession();
 	Switcher->SetActiveWidget(MainMenu);
 }
 
@@ -56,8 +79,10 @@ void UMainMenu::HostServer()
 
 void UMainMenu::JoinServer()
 {
-	if (!MenuInterface || !IPAddressField) return;
-	const FString& Address = IPAddressField->GetText().ToString();
+	if (!MenuInterface) return;
+	const FString& Address = "";
 	MenuInterface->Join(Address);
 
 }
+
+
