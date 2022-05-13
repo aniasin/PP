@@ -40,10 +40,13 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ScrollBox_ServerList;
 
+
 	UPROPERTY()
 	TArray<UUserWidget*> ServerResults;
 
 	virtual void FoundSessions(TArray<FString> Sessions) override;
+
+	void SetSelectedSession(uint32 Index);
 
 protected:
 	virtual bool Initialize();
@@ -59,4 +62,6 @@ private:
 	void HostServer();
 	UFUNCTION()
 	void JoinServer();
+
+	uint32 SelectedSession;
 };

@@ -30,7 +30,7 @@ public:
 	void CreateSession();
 
 	UFUNCTION()
-	void Join(const FString& IPAddress) override;
+	void Join(const int32& SessionIndex) override;
 	UFUNCTION()
 	void SearchSession() override;
 	UFUNCTION()
@@ -57,5 +57,6 @@ private:
 	void SessionDestroyed(FName SessionName, bool bSuccess);
 	void FoundSession(bool bSuccess);
 	void CancelSearchSession(bool bSuccess);
+	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	
 };

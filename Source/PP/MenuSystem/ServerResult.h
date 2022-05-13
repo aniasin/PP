@@ -16,11 +16,17 @@ class PP_API UServerResult : public UUserWidget
 
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_ServerName;
+	class UButton* BTN;
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_ServerName;	
 
-	void SetTitleText(FString Title);
+	void SetUp(class UMainMenu* MainMenu, uint32 Index, FString Title);
 
 private:
+	class UMainMenu* MainMenu;
+	uint32 ButtonIndex = -1;
 
+	UFUNCTION()
+	void Clicked();
 
 };

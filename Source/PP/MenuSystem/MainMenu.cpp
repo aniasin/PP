@@ -2,8 +2,10 @@
 
 
 #include "PP/MenuSystem/MainMenu.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
 #include "PP/MenuSystem/ServerResult.h"
 
@@ -44,16 +46,32 @@ void UMainMenu::OpenJoinMenu()
 {
 	if (!Switcher || !JoinMenu) return;
 	Switcher->SetActiveWidget(JoinMenu);
+	SelectedSession = -1;
 	MenuInterface->SearchSession();
 }
 
 void UMainMenu::FoundSessions(TArray<FString> Sessions)
 {
+	uint32 i = 0;
 	for (const FString Session : Sessions)
 	{
 		UServerResult* ServerResult = CreateWidget<UServerResult>(this, ServerResultClass);
 		ScrollBox_ServerList->AddChild(ServerResult);
-		ServerResult->SetTitleText(Session);
+		ServerResult->SetUp(this, i, Session);
+		i++;
+	}
+}
+
+void UMainMenu::SetSelectedSession(uint32 Index)
+{
+	SelectedSession = Index;
+	for (UWidget* ResultWidget : ScrollBox_ServerList->GetAllChildren())
+	{
+		UServerResult* ServerResult = Cast<UServerResult>(ResultWidget);
+		if (ServerResult && ServerResult != ScrollBox_ServerList->GetAllChildren()[Index])
+		{
+			ServerResult->SetColorAndOpacity(FLinearColor::White);
+		}
 	}
 }
 
@@ -61,6 +79,7 @@ void UMainMenu::OpenMainMenu()
 {
 	if (!Switcher || !MainMenu || !ScrollBox_ServerList) return;
 	ScrollBox_ServerList->ClearChildren();
+	SelectedSession = -1;
 	MenuInterface->CancelSearchSession();
 	Switcher->SetActiveWidget(MainMenu);
 }
@@ -80,9 +99,7 @@ void UMainMenu::HostServer()
 void UMainMenu::JoinServer()
 {
 	if (!MenuInterface) return;
-	const FString& Address = "";
-	MenuInterface->Join(Address);
-
+	MenuInterface->Join(SelectedSession);
 }
 
 

@@ -40,6 +40,7 @@ void UPP_GameInstance::Init()
 		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::SessionDestroyed);
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::FoundSession);
 		SessionInterface->OnCancelFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::CancelSearchSession);
+		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::JoinSessionComplete);
 	}
 	else { UE_LOG(LogTemp, Warning, TEXT("Session Interface not found!")) }
 
@@ -75,45 +76,43 @@ void UPP_GameInstance::LoadMainMenu()
 
 void UPP_GameInstance::QuitGame()
 {
-	if (SessionInterface && SessionInterface->GetNamedSession(SESSION_NAME))
-	{
-		DestroySession();
-	}
-
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Quiting... "));
 	GetFirstLocalPlayerController()->ConsoleCommand("quit");
 }
 
 void UPP_GameInstance::Host()
 {
-	if (SessionInterface && !SessionInterface->GetNamedSession(SESSION_NAME))
+	if (SessionInterface)
 	{
-		CreateSession();
-	}
-	else 
-	{ 
-		DestroySession();
+		if (SessionInterface->GetNamedSession(SESSION_NAME))
+		{
+			DestroySession();
+		}
+		else
+		{
+			CreateSession();
+		}		
 	}
 }
 
-void UPP_GameInstance::Join(const FString& IPAddress)
+void UPP_GameInstance::Join(const int32& SessionIndex)
 {
-	if (!SessionInterface || !SessionInterface->GetNamedSession(SESSION_NAME))
+	if (SessionIndex >= 0)
 	{
 		if (Menu) Menu->TearDown();
-		GetWorld()->ServerTravel("Map01?listen");
+		SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[SessionIndex]);
 	}
 }
 
 void UPP_GameInstance::SearchSession()
 {
-	if (SessionInterface && SessionInterface->GetNamedSession(SESSION_NAME))
+	if (SessionInterface)
 	{
 		SessionSearch = MakeShareable(new FOnlineSessionSearch);
 		if (SessionSearch)
 		{
 			SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-			UE_LOG(LogTemp, Warning, TEXT("Searching Session..."))
+			GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Searching Session... "));
 		}
 	}
 }
@@ -163,10 +162,6 @@ void UPP_GameInstance::SessionDestroyed(FName SessionName, bool bSuccess)
 	{
 		CreateSession();
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to destroy Session!"))
-	}
 }
 
 void UPP_GameInstance::FoundSession(bool bSuccess)
@@ -192,6 +187,21 @@ void UPP_GameInstance::CancelSearchSession(bool bSuccess)
 {
 	if(bSuccess) UE_LOG(LogTemp, Warning, TEXT("Search Canceled!"))
 }
+
+void UPP_GameInstance::JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	FString Address;
+	if (!SessionInterface) return;
+	if (!SessionInterface->GetResolvedConnectString(SessionName, Address))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not get connect String!"))
+	}
+	APlayerController* PC = GetFirstLocalPlayerController();
+	if (!PC) return;
+
+	PC->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+}
+
 
 
 
