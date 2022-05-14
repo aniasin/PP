@@ -111,6 +111,7 @@ void UPP_GameInstance::SearchSession()
 		SessionSearch = MakeShareable(new FOnlineSessionSearch);
 		if (SessionSearch)
 		{
+			SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 			SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 			GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Searching Session... "));
 		}
@@ -130,9 +131,11 @@ void UPP_GameInstance::CreateSession()
 	if (!SessionInterface) return;
 
 	FOnlineSessionSettings SessionSettings;
-	SessionSettings.bIsLANMatch = true;
+	SessionSettings.bIsLANMatch = false;
 	SessionSettings.NumPublicConnections = 2;
 	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.bUsesPresence = true;
+	SessionSettings.bUseLobbiesIfAvailable = true;
 	SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 }
 
