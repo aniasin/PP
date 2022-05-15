@@ -6,9 +6,17 @@
 #include "PP/MenuSystem/MenuBase.h"
 #include "MainMenu.generated.h"
 
-/**
- * 
- */
+USTRUCT()
+struct FSessionData
+{
+	GENERATED_BODY()
+
+	FString Name;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUserName;
+};
+
 UCLASS()
 class PP_API UMainMenu : public UMenuBase
 {
@@ -44,7 +52,7 @@ public:
 	UPROPERTY()
 	TArray<UUserWidget*> ServerResults;
 
-	virtual void FoundSessions(TArray<FString> Sessions) override;
+	void FoundSessions(TArray<FSessionData> Sessions);
 
 	void SetSelectedSession(uint32 Index);
 

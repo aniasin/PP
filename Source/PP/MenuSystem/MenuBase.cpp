@@ -38,7 +38,3 @@ void UMenuBase::TearDown()
 	PC->SetShowMouseCursor(false);
 }
 
-void UMenuBase::FoundSessions(TArray<FString> Sessions)
-{
-
-}

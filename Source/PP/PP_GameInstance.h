@@ -34,8 +34,6 @@ public:
 	UFUNCTION()
 	void SearchSession() override;
 	UFUNCTION()
-	void CancelSearchSession() override;
-	UFUNCTION()
 	void LoadMainMenu() override;
 	UFUNCTION()
 	void QuitGame() override;
@@ -45,10 +43,11 @@ public:
 	void NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
 private:
+	FString CurrentVersion = "0.0.5";
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
 
-	class UMenuBase* Menu;
+	class UMainMenu* Menu;
 
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
@@ -56,7 +55,6 @@ private:
 	void SessionCreated(FName SessionName, bool bSuccess);
 	void SessionDestroyed(FName SessionName, bool bSuccess);
 	void FoundSession(bool bSuccess);
-	void CancelSearchSession(bool bSuccess);
 	void JoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	
 };

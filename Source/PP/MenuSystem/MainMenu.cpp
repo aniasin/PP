@@ -50,10 +50,10 @@ void UMainMenu::OpenJoinMenu()
 	MenuInterface->SearchSession();
 }
 
-void UMainMenu::FoundSessions(TArray<FString> Sessions)
+void UMainMenu::FoundSessions(TArray<FSessionData> Sessions)
 {
 	uint32 i = 0;
-	for (const FString Session : Sessions)
+	for (const FSessionData Session : Sessions)
 	{
 		UServerResult* ServerResult = CreateWidget<UServerResult>(this, ServerResultClass);
 		ScrollBox_ServerList->AddChild(ServerResult);
@@ -70,7 +70,8 @@ void UMainMenu::SetSelectedSession(uint32 Index)
 		UServerResult* ServerResult = Cast<UServerResult>(ResultWidget);
 		if (ServerResult && ServerResult != ScrollBox_ServerList->GetAllChildren()[Index])
 		{
-			ServerResult->SetColorAndOpacity(FLinearColor::White);
+			ServerResult->SetTextColor(FLinearColor::White);
+			ServerResult->SetButtonSelected(false);
 		}
 	}
 }
@@ -80,7 +81,6 @@ void UMainMenu::OpenMainMenu()
 	if (!Switcher || !MainMenu || !ScrollBox_ServerList) return;
 	ScrollBox_ServerList->ClearChildren();
 	SelectedSession = -1;
-	MenuInterface->CancelSearchSession();
 	Switcher->SetActiveWidget(MainMenu);
 }
 
