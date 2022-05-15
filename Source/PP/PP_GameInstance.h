@@ -25,8 +25,9 @@ public:
 	void LoadGameMenu();
 
 	UFUNCTION()
-	void Host() override;
+	void Host(FString SessionName) override;
 
+	FString DesiredSessionName;
 	void CreateSession();
 
 	UFUNCTION()
@@ -43,7 +44,7 @@ public:
 	void NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
 private:
-	FString CurrentVersion = "0.0.5";
+	FString CurrentVersion = "0.0.7";
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
 

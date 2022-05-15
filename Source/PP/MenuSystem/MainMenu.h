@@ -27,7 +27,7 @@ class PP_API UMainMenu : public UMenuBase
 
 public:
 	UPROPERTY(meta = (BindWidget))
-	class UButton* BTN_Host;
+	class UButton* BTN_HostMenu;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_Join;
 	UPROPERTY(meta = (BindWidget))
@@ -35,7 +35,11 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_CancelJoinGame;
 	UPROPERTY(meta = (BindWidget))
+	class UButton* BTN_CancelCreateSession;
+	UPROPERTY(meta = (BindWidget))
 	class UButton* BTN_JoinGame;
+	UPROPERTY(meta = (BindWidget))
+		class UButton* BTN_Host;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* Switcher;
@@ -43,8 +47,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* MainMenu;
 	UPROPERTY(meta = (BindWidget))
+	class UWidget* HostMenu;
+	UPROPERTY(meta = (BindWidget))
 	class UWidget* JoinMenu;
 
+	UPROPERTY(meta = (BindWidget))
+	class UEditableTextBox* EditableTextBox_SessionName;
 	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* ScrollBox_ServerList;
 
@@ -60,6 +68,8 @@ protected:
 	virtual bool Initialize();
 
 private:
+	UFUNCTION()
+	void OpenHostMenu();
 	UFUNCTION()
 	void OpenJoinMenu();
 	UFUNCTION()

@@ -24,8 +24,8 @@ bool UMainMenu::Initialize()
 	bool bsuccess = Super::Initialize();
 	if (!bsuccess) return false;
 
-	if (!BTN_Host) return false;
-	BTN_Host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+	if (!BTN_HostMenu) return false;
+	BTN_HostMenu->OnClicked.AddDynamic(this, &UMainMenu::OpenHostMenu);
 
 	if (!BTN_Join) return false;
 	BTN_Join->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
@@ -36,10 +36,22 @@ bool UMainMenu::Initialize()
 	if (!BTN_JoinGame) return false;
 	BTN_JoinGame->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 
+	if (!BTN_Host) return false;
+	BTN_Host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+
 	if (!BTN_CancelJoinGame) return false;
 	BTN_CancelJoinGame->OnClicked.AddDynamic(this, &UMainMenu::OpenMainMenu);
 
+	if (!BTN_CancelCreateSession) return false;
+	BTN_CancelCreateSession->OnClicked.AddDynamic(this, &UMainMenu::OpenMainMenu);
+
 	return true;
+}
+
+void UMainMenu::OpenHostMenu()
+{
+	if (!Switcher || !HostMenu) return;
+	Switcher->SetActiveWidget(HostMenu);
 }
 
 void UMainMenu::OpenJoinMenu()
@@ -93,7 +105,8 @@ void UMainMenu::QuitGame()
 void UMainMenu::HostServer()
 {
 	if (!MenuInterface) return;
-	MenuInterface->Host();
+	FString SessionName = EditableTextBox_SessionName->Text.ToString();
+	MenuInterface->Host(SessionName);
 }
 
 void UMainMenu::JoinServer()

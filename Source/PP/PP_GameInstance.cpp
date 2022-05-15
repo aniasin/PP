@@ -10,6 +10,7 @@
 #include "PP/MenuSystem/MainMenu.h"
 
 const static FName SESSION_NAME = TEXT("My Session");
+const static FName SERVER_NAME_SETTINGS_KEY = TEXT("SessionName");
 
 UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
@@ -80,8 +81,9 @@ void UPP_GameInstance::QuitGame()
 	GetFirstLocalPlayerController()->ConsoleCommand("quit");
 }
 
-void UPP_GameInstance::Host()
+void UPP_GameInstance::Host(FString SessionName)
 {
+	DesiredSessionName = SessionName;
 	if (SessionInterface)
 	{
 		if (SessionInterface->GetNamedSession(SESSION_NAME))
@@ -129,6 +131,7 @@ void UPP_GameInstance::CreateSession()
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bUseLobbiesIfAvailable = true;
+	SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, DesiredSessionName, EOnlineDataAdvertisementType::ViaOnlineService);
 	SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
 
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Session Created!"));
@@ -175,7 +178,15 @@ void UPP_GameInstance::FoundSession(bool bSuccess)
 			SessionData.HostUserName = SessionSearchResult.Session.OwningUserId->ToString();
 			SessionData.MaxPlayers = SessionSearchResult.Session.SessionSettings.NumPublicConnections;
 			SessionData.CurrentPlayers = SessionData.MaxPlayers - SessionSearchResult.Session.NumOpenPublicConnections;
-			SessionData.Name = SessionSearchResult.GetSessionIdStr();
+			FString SessionName;
+			if (SessionSearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS_KEY, SessionName))
+			{
+				SessionData.Name = SessionName;
+			}
+			else
+			{
+				SessionData.Name = "Could not find name.";
+			}
 			Results.Add(SessionData);
 		}
 	}
