@@ -8,8 +8,9 @@
 #include "Blueprint/UserWidget.h"
 #include "PP/MenuSystem/MenuBase.h"
 #include "PP/MenuSystem/MainMenu.h"
+#include "MoviePlayer.h"
 
-const static FName SESSION_NAME = TEXT("My Session");
+
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("SessionName");
 
 UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
@@ -30,6 +31,11 @@ UPP_GameInstance::UPP_GameInstance(const FObjectInitializer& ObjectInitializer)
 
 void UPP_GameInstance::Init()
 {
+	// Displays a simple loading widget while any level loads
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UPP_GameInstance::BeginLoadingScreen);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UPP_GameInstance::EndLoadingScreen);
+
+
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	FString LogMessage;
 	OnlineSubsystem != nullptr ? LogMessage = OnlineSubsystem->GetSubsystemName().ToString() : "OnlineSubsystem not found!";
@@ -44,10 +50,29 @@ void UPP_GameInstance::Init()
 		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::JoinSessionComplete);
 	}
 	else { UE_LOG(LogTemp, Warning, TEXT("Session Interface not found!")) }
-
-
-
 	GEngine->OnNetworkFailure().AddUObject(this, &UPP_GameInstance::NetworkError);
+}
+
+void UPP_GameInstance::BeginLoadingScreen(const FString& InMapName)
+{
+	if (!IsRunningDedicatedServer())
+	{
+		FLoadingScreenAttributes LoadingScreen;
+		LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
+		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
+
+		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+	}
+}
+
+void UPP_GameInstance::EndLoadingScreen(UWorld* InLoadedWorld)
+{
+	/// can be overriden to have custom effects
+}
+
+void UPP_GameInstance::NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	LoadMainMenu();
 }
 
 void UPP_GameInstance::LoadMenu()
@@ -86,7 +111,7 @@ void UPP_GameInstance::Host(FString SessionName)
 	DesiredSessionName = SessionName;
 	if (SessionInterface)
 	{
-		if (SessionInterface->GetNamedSession(SESSION_NAME))
+		if (SessionInterface->GetNamedSession(NAME_GameSession))
 		{
 			DestroySession();
 		}
@@ -102,7 +127,7 @@ void UPP_GameInstance::Join(const int32& SessionIndex)
 	if (SessionIndex >= 0)
 	{
 		if (Menu) Menu->TearDown();
-		SessionInterface->JoinSession(0, SESSION_NAME, SessionSearch->SearchResults[SessionIndex]);
+		SessionInterface->JoinSession(0, NAME_GameSession, SessionSearch->SearchResults[SessionIndex]);
 	}
 }
 
@@ -131,20 +156,15 @@ void UPP_GameInstance::CreateSession()
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bUseLobbiesIfAvailable = true;
-	SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, DesiredSessionName, EOnlineDataAdvertisementType::ViaOnlineService);
-	SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
+	SessionSettings.Set(SERVER_NAME_SETTINGS_KEY, DesiredSessionName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+	SessionInterface->CreateSession(0, NAME_GameSession, SessionSettings);
 
 	GEngine->AddOnScreenDebugMessage(0, 2, FColor::Green, TEXT("Session Created!"));
 }
 
 void UPP_GameInstance::DestroySession()
 {
-	SessionInterface->DestroySession(SESSION_NAME);
-}
-
-void UPP_GameInstance::NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
-{
-	LoadMainMenu();
+	SessionInterface->DestroySession(NAME_GameSession);
 }
 
 void UPP_GameInstance::SessionCreated(FName SessionName, bool bSuccess)
@@ -154,7 +174,7 @@ void UPP_GameInstance::SessionCreated(FName SessionName, bool bSuccess)
 	if (Menu) Menu->TearDown();
 	UWorld* World = GetWorld();
 	if (!World) return;
-	World->ServerTravel("Map01?listen");
+	World->ServerTravel("Lobby?listen");
 }
 
 void UPP_GameInstance::SessionDestroyed(FName SessionName, bool bSuccess)
@@ -175,7 +195,7 @@ void UPP_GameInstance::FoundSession(bool bSuccess)
 			UE_LOG(LogTemp, Warning, TEXT("Found Sessions names: %s!"), *SessionSearchResult.GetSessionIdStr())
 			FSessionData SessionData;
 			
-			SessionData.HostUserName = SessionSearchResult.Session.OwningUserId->ToString();
+			SessionData.HostUserName = SessionSearchResult.Session.OwningUserName;
 			SessionData.MaxPlayers = SessionSearchResult.Session.SessionSettings.NumPublicConnections;
 			SessionData.CurrentPlayers = SessionData.MaxPlayers - SessionSearchResult.Session.NumOpenPublicConnections;
 			FString SessionName;
