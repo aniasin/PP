@@ -46,7 +46,7 @@ public:
 	void NetworkError(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
 private:
-	FString CurrentVersion = "0.0.9";
+	FString CurrentVersion = "0.0.10";
 	TSubclassOf<class UUserWidget> MenuClass;
 	TSubclassOf<class UUserWidget> GameMenuClass;
 

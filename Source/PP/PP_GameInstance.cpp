@@ -152,7 +152,7 @@ void UPP_GameInstance::CreateSession()
 	FOnlineSessionSettings SessionSettings;
 	IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	OnlineSubsystem->GetSubsystemName() == "NULL" ? SessionSettings.bIsLANMatch = true : SessionSettings.bIsLANMatch = false;
-	SessionSettings.NumPublicConnections = 2;
+	SessionSettings.NumPublicConnections = 4;
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bUseLobbiesIfAvailable = true;

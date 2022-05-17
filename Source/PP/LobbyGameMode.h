@@ -14,8 +14,13 @@ class PP_API ALobbyGameMode : public APPGameMode
 {
 	GENERATED_BODY()
 
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
 	int32 PlayersCount;
+
+private:
+	UFUNCTION()
+	void StartGame();
 };
